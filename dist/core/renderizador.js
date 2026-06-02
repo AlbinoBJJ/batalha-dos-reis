@@ -6,10 +6,10 @@ export class Renderizador {
         }
         this.container = elemento;
         // Inicialização dos buffers de áudio nativos
-        this.somMovimento = new Audio('../assets/sounds/move.mp3');
-        this.somInicio = new Audio('../assets/sounds/ogro-grito.mp3');
-        this.somDerrota = new Audio('../assets/sounds/risada.mp3');
-        this.somVitoria = new Audio('../assets/sounds/tadaa.mp3');
+        this.somMovimento = new Audio('assets/sounds/move.mp3');
+        this.somInicio = new Audio('assets/sounds/ogro-grito.mp3');
+        this.somDerrota = new Audio('assets/sounds/risada.mp3');
+        this.somVitoria = new Audio('assets/sounds/tadaa.mp3');
     }
     reproduzirSomMovimento() {
         this.somMovimento.currentTime = 0;
@@ -76,24 +76,24 @@ export class Renderizador {
             let urlImagem = '';
             if (dadosCasa.peca.tipo === 'REI_BRANCO') {
                 if (estadoVisual === 'VITORIA') {
-                    urlImagem = '../assets/images/rei-branco-vitoria.png';
+                    urlImagem = 'assets/images/rei-branco-vitoria.png';
                 }
                 else if (estadoVisual === 'DERROTA') {
-                    urlImagem = '../assets/images/rei-branco-derrota.png';
+                    urlImagem = 'assets/images/rei-branco-derrota.png';
                 }
                 else {
-                    urlImagem = '../assets/images/rei-branco.png';
+                    urlImagem = 'assets/images/rei-branco.png';
                 }
             }
             else if (dadosCasa.peca.tipo === 'REI_PRETO') {
                 if (estadoVisual === 'VITORIA') {
-                    urlImagem = '../assets/images/ogro-derrota.png';
+                    urlImagem = 'assets/images/ogro-derrota.png';
                 }
                 else if (estadoVisual === 'DERROTA') {
-                    urlImagem = '../assets/images/ogro-vitoria.png';
+                    urlImagem = 'assets/images/ogro-vitoria.png';
                 }
                 else {
-                    urlImagem = '../assets/images/ogro-normal.png';
+                    urlImagem = 'assets/images/ogro-normal.png';
                 }
             }
             const imgTeste = new Image();
