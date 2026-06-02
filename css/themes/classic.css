@@ -1,0 +1,14 @@
+/* TEMA CLÁSSICO: Preto e Branco Alternados */
+
+.tema-classico .casa-clara {
+    background-color: #f0d9b5;
+}
+
+.tema-classico .casa-escura {
+    background-color: #b58863;
+}
+
+/* Definição visual das bordas do tabuleiro clássico se necessário */
+.tema-classico #tabuleiro-container {
+    border: 2px solid #b58863;
+}

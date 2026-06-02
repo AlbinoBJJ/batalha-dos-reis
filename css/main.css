@@ -1,0 +1,327 @@
+/* ==========================================================================
+   1. CONFIGURAÇÕES GLOBAIS E RESETS
+   ========================================================================== */
+:root {
+    --tamanho-max-tabuleiro: 500px;
+    --tamanho-min-tabuleiro: 280px;
+    --cor-fundo-card: #1e2227;
+    --cor-borda-card: #3e4451;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212;
+    color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background-image: url('../assets/images/background-cenario.png'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+/* ==========================================================================
+   2. MOTOR DE LAYOUT PRINCIPAL (CSS GRID TRÊS COLUNASCOESAS)
+   ========================================================================== */
+.motor-game-container {
+    display: grid;
+    grid-template-columns: 280px 1fr 340px;
+    gap: 25px;
+    align-items: start;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Responsividade de quebra de layout para Tablets e Mobile */
+@media (max-width: 992px) {
+    .motor-game-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .painel-sidebar {
+        order: 3;
+    }
+}
+
+/* ==========================================================================
+   3. BLOCOS E PAINÉIS (ESTILIZAÇÃO DE COMPONENTES)
+   ========================================================================== */
+.painel-card {
+    background: rgba(30, 34, 39, 0.93);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--cor-borda-card);
+    border-radius: 12px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.d-flex-column {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 15px;
+}
+
+.divisor-painel {
+    border: 0;
+    border-top: 1px solid var(--cor-borda-card);
+    margin: 10px 0 15px 0;
+    opacity: 0.5;
+}
+
+.titulo-painel {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.grupo-campo label {
+    display: block;
+    font-size: 0.85rem;
+    color: #abb2bf;
+    margin-bottom: 6px;
+}
+
+.form-select {
+    width: 100%;
+    background-color: #2b3035;
+    color: #fff;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #495057;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   4. CENTRALIZAÇÃO E ESTRUTURA DO TABULEIRO
+   ========================================================================== */
+.painel-tabuleiro {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 450px;
+}
+
+#wrapper-tabuleiro {
+    width: 100%;
+    max-width: var(--tamanho-max-tabuleiro);
+    min-width: var(--tamanho-min-tabuleiro);
+    background: rgba(33, 37, 41, 0.5);
+    border: 3px solid #454d55;
+    padding: 15px;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+#tabuleiro-container {
+    display: grid;
+    grid-template-columns: repeat(var(--total-colunas, 8), 1fr);
+    grid-template-rows: repeat(var(--total-linhas, 8), 1fr);
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: #404040;
+    user-select: none;
+}
+
+.casa {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s ease, filter 0.1s ease;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.casa:hover {
+    filter: brightness(1.2);
+}
+
+.casa.selecionada {
+    box-shadow: inset 0 0 0 4px #ffc107;
+}
+
+.casa.movimento-valido::after {
+    content: "";
+    width: 30%;
+    height: 30%;
+    background-color: rgba(40, 167, 69, 0.7);
+    border-radius: 50%;
+    position: absolute;
+    z-index: 3;
+}
+
+/* ==========================================================================
+   5. ENGINE DE PEÇAS E RENDERING VISUAL
+   ========================================================================== */
+.peca {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 85%;
+    height: 85%;
+    cursor: grab;
+    touch-action: none;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    user-select: none;
+    z-index: 2;
+    transition: transform 0.2s ease;
+}
+
+.peca.movendo {
+    transform: scale(1.1);
+}
+
+.peca-usando-fonte {
+    font-family: 'ChessCases', 'ChessAlpha', sans-serif;
+    font-size: 3rem;
+    line-height: 1;
+}
+
+/* ==========================================================================
+   6. COMPONENTES EXCLUSIVOS DA SIDEBAR (CONTEÚDO LÚDICO)
+   ========================================================================== */
+.status-box-alvo {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #454d55;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.status-subtitulo {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #5c6370;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.status-texto-principal {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.bloco-info {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.bloco-info p {
+    font-size: 0.88rem;
+    color: #caeed8;
+    opacity: 0.85;
+    line-height: 1.4;
+    margin: 0 0 12px 0;
+}
+
+.cabecalho-bloco {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.cabecalho-bloco h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.avatar-coruja {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+/* Animação para quando o Ogro pensa */
+.animate-pulse {
+    animation: pulseVisual 1.5s infinite ease-in-out;
+}
+
+@keyframes pulseVisual {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+/* ==========================================================================
+   7. BOTÕES PADRONIZADOS DA GAME ENGINE
+   ========================================================================== */
+.btn-gameplay {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    border: none;
+    box-sizing: border-box;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.btn-gameplay:active {
+    transform: scale(0.98);
+}
+
+.btn-reiniciar-estilo {
+    background: #ffc107;
+    color: #212529;
+}
+
+.btn-reiniciar-estilo:hover {
+    background: #e0a800;
+}
+
+.btn-disabled {
+    background: transparent;
+    border: 1px solid currentColor;
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* Utilitários de Cor */
+.text-info { color: #56b6c2 !important; }
+.text-success { color: #98c379 !important; }
+.text-warning { color: #e5c07b !important; }
+.text-danger { color: #ec637b !important; }
+
+/* ==========================================================================
+   8. AJUSTES DE CONTRASTE E LEGIBILIDADE (CABEÇALHO)
+   ========================================================================== */
+header h1 {
+    /* Cria um contorno preto de 2px ao redor de toda a fonte amarela */
+    text-shadow: 
+        -2px -2px 0 #121212,  
+         2px -2px 0 #121212,
+        -2px  2px 0 #121212,
+         2px  2px 0 #121212,
+         0px  4px 8px rgba(0, 0, 0, 0.8); /* Sombra projetada para dar profundidade */
+}
+
+header p {
+    color: #ffffff !important; /* Força o subtítulo a ficar branco brilhante */
+    font-weight: 600; /* Deixa a fonte ligeiramente mais espessa */
+    /* Cria um contorno de 1.5px ao redor do texto explicativo */
+    text-shadow: 
+        -1.5px -1.5px 0 #121212,  
+         1.5px -1.5px 0 #121212,
+        -1.5px  1.5px 0 #121212,
+         1.5px  1.5px 0 #121212,
+         0px  2px 4px rgba(0, 0, 0, 0.9);
+}

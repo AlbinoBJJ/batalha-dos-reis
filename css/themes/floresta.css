@@ -1,0 +1,97 @@
+/* ==========================================================================
+   TEMA FLORESTA - RENDERING COESO E LIMPO
+   ========================================================================== */
+
+/* Casas Claras - Seu espaço para colocar o background de textura de grama clara futuramente */
+.tema-floresta .casa-clara {
+    background-color: #a3c9a8;
+}
+
+/* Casas Escuras - Seu espaço para colocar o background de textura de grama escura futuramente */
+.tema-floresta .casa-escura {
+    background-color: #618b66;
+}
+
+/* Casas de Obstáculo */
+.tema-floresta .casa-obstaculo {
+    background-color: #332211;
+}
+
+/* ==========================================================================
+   ZONA DE VITÓRIA (LINHA DO TOPO DEFINIDA PELO TYPESCRIPT)
+   ========================================================================== */
+/* A casa em si não tem mais cor injetada nem imagem no fundo direto dela */
+.tema-floresta .casa-floresta {
+    position: relative;
+    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.25) !important; /* Sombra sutil de profundidade */
+}
+
+/* Criamos uma camada flutuante para as árvores usando o pseudo-elemento ::after */
+.tema-floresta .casa-floresta::after {
+    content: ""; /* Deixa o conteúdo vazio para usar a imagem */
+    position: absolute;
+    
+    /* Configura a imagem das árvores */
+    background-image: url('../../assets/images/floresta.png');
+    background-repeat: no-repeat;
+    background-position: center bottom; /* Árvores brotando do chão da casa */
+    background-size: 90% auto; /* Ajuste de tamanho para cobrir bem a casa */
+    
+    /* Ocupa 100% do espaço da célula para alinhar perfeitamente */
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    
+    z-index: 1; /* Fica acima da grama, mas abaixo da peça do Ogro (que é z-index: 2) */
+    pointer-events: none; /* Garante que o clique do mouse passe direto para a casa */
+}
+
+/* ==========================================================================
+   ELEMENTOS INTERATIVOS DO CENÁRIO (BAÚS DE TESOURO EM PNG)
+   ========================================================================== */
+.tema-floresta .casa[data-linha="3"][data-coluna="3"]::before,
+.tema-floresta .casa[data-linha="3"][data-coluna="4"]::before,
+.tema-floresta .casa[data-linha="4"][data-coluna="3"]::before,
+.tema-floresta .casa[data-linha="4"][data-coluna="4"]::before {
+    content: ""; /* Removemos o emoji de texto antigo */
+    position: absolute;
+    
+    /* Configura o caminho correto da sua nova imagem */
+    background-image: url('../../assets/images/tesouro.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    /* Controla o tamanho físico do baú de tesouro dentro da casa (40% do tamanho da célula) */
+    background-size: contain;
+    width: 40%;
+    height: 40%;
+    
+    /* Garante que o baú fique centralizado na casa */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    opacity: 0.85; /* Um pouco mais visível para as crianças acharem o objetivo */
+    z-index: 1; /* Fica abaixo das peças (Rei e Ogro), mas acima do chão */
+}
+
+/* ==========================================================================
+    PEÇAS
+   ========================================================================== */
+
+.peca {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    font-size: 2.2rem;
+    line-height: 1;
+    cursor: grab;
+    touch-action: none;
+}
+
+.peca:active {
+    cursor: grabbing;
+}

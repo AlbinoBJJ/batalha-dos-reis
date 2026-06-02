@@ -1,0 +1,17 @@
+{
+  "name": "mini-chess-engine",
+  "version": "1.0.0",
+  "description": "Motor modular para mini jogos de xadrez",
+  "main": "dist/app.js",
+  "scripts": {
+    "dev": "tsc --watch",
+    "start": "lite-server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "lite-server": "^2.6.1",
+    "typescript": "^6.0.3"
+  }
+}

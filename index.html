@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-Jogos de Xadrez</title>
+    <link rel="icon" type="image/png" href="assets/images/kabure-iwa.png">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" id="tema-css" href="css/themes/floresta.css">
+</head>
+<body class="bg-dark text-light">
+
+    <div class="container py-4">
+        <header class="text-center mb-4">
+            <h1 class="display-5 fw-bold text-warning" style="text-align: center; margin-top: 20px;">Mini jogos de Xadrez</h1>
+            <p class="text-muted" style="text-align: center; margin-bottom: 30px;">Escolha seu mini jogo</p>
+        </header>
+
+        <main class="motor-game-container">
+            
+            <section class="painel-config">
+                <div class="painel-card shadow">
+                    <h5 class="titulo-painel text-warning">Configurações</h5>
+                    <hr class="divisor-painel">
+                    
+                    <div class="grupo-campo" style="margin-bottom: 20px;">
+                        <label for="seletor-jogo">Selecione o Mini-Jogo:</label>
+                        <select id="seletor-jogo" class="form-select">
+                            <option value="ogre-sumo">Batalha dos Reis</option>
+                        </select>
+                    </div>
+
+                    <button id="btn-reiniciar" class="btn-gameplay btn-reiniciar-estilo">
+                        Reiniciar Partida
+                    </button>
+                </div>
+            </section>
+
+            <section class="painel-tabuleiro">
+                <div id="wrapper-tabuleiro" class="shadow">
+                    <div id="tabuleiro-container"></div>
+                </div>
+            </section>
+
+            <aside class="painel-sidebar">
+                <div class="painel-card shadow h-100 d-flex-column">
+                    
+                    <div class="status-box-alvo">
+                        <span class="status-subtitulo">Status da Partida</span>
+                        <div id="status-turno" class="status-texto-principal text-success">Sua vez</div>
+                    </div>
+
+                    <hr class="divisor-painel">
+
+                    <div class="bloco-info">
+                        <div class="cabecalho-bloco text-info">
+                            <img src="assets/images/kabure-iwa.png" alt="🦉" class="avatar-coruja" onerror="this.style.display='none'">
+                            <h5>Objetivo</h5>
+                        </div>
+                        <p>
+                            O objetivo do Rei Branco é expulsar o Rei Ogro para a floresta, ou seja, a última fileira do tabuleiro. Mas cuidado: os Reis nunca podem ir para uma casa que pode ser atacado! É como se possuíssem um campo de força invisível e nunca podem se encostar, pois se caso isso acontecer, o Rei que se aproximou se colocaria em posição de perigo, sofrendo um ataque! NUNCA, JAMAIS, coloque seu Rei sob perigo! Para ganhar o jogo, você precisa manter a oposição!
+                        </p>
+                        <button class="btn-gameplay btn-disabled" id="btn-ajuda-regras" disabled>
+                            Chamar Mestre Kaburé-iwa
+                        </button>
+                    </div>
+
+                    <div class="bloco-info mt-auto">
+                        <div class="cabecalho-bloco text-success">
+                            <img src="assets/images/kabure-iwa.png" alt="🦉" class="avatar-coruja" onerror="this.style.display='none'">
+                            <h5>O que é Oposição?</h5>
+                        </div>
+                        <p>
+                            A Oposição acontece quando os dois Reis ficam frente a frente, separados por apenas uma casa. 
+                            Quem joga nessa situação força o outro Rei a recuar, ganhando espaço! Aquele que joga o Rei ficando frente a frente do outro, dizemos que ele ganhou a oposição! Tente GANHAR a oposição sempre!
+                        </p>
+                        <button class="btn-gameplay btn-disabled" id="btn-ajuda-oposicao" disabled>
+                            Explicação da Corujinha
+                        </button>
+                    </div>
+
+                </div>
+            </aside>
+
+        </main>
+    </div>
+
+    <script type="module" src="dist/app.js"></script>
+</body>
+</html>
