@@ -1,6 +1,6 @@
 export const CONFIG_SUMO = {
     id: 'ogre-sumo',
-    nome: 'Sumô de Reis (Oposição Direta)',
+    nome: 'Batalha dos Reis',
     linhas: 8,
     colunas: 8,
     temaClasseCSS: 'tema-floresta', // Conecta diretamente com css/themes/floresta.css

@@ -4,7 +4,7 @@ import { IRegra } from '../contratos/iregra.js';
 import { IConfiguracaoJogo, ICoordenada } from '../contratos/itabuleiro.js';
 
 export class GerenciadorJogo {
-    private tablero!: Tabuleiro; // Mantido para compatibilidade com a assinatura interna do motor
+    private tablero!: Tabuleiro; 
     private tabuleiro!: Tabuleiro;
     private renderizador: Renderizador;
     private regraAtual!: IRegra;
@@ -25,7 +25,7 @@ export class GerenciadorJogo {
         this.regraAtual = regras;
         
         this.tabuleiro = new Tabuleiro(config.linhas, config.colunas);
-        this.tablero = this.tabuleiro; // Sincroniza a propriedade interna herdada se houver
+        this.tablero = this.tabuleiro; 
         this.renderizador.configurarEstiloTabuleiro(config.linhas, config.colunas, config.temaClasseCSS);
         this.regraAtual.inicializarCenario(this.tabuleiro);
         
@@ -35,9 +35,46 @@ export class GerenciadorJogo {
         this.jogoFinalizado = false;
         this.lancesRestantes = 15;
 
-        // GATILHO: Dispara o grito do ogro no início da partida!
-        this.renderizador.reproduzirSomInicio();
+        // 1. Alimenta os textos dinâmicos e títulos na nova interface
+        this.renderizador.atualizarTextosInterface(
+            config.nome, 
+            this.regraAtual.getObjetivoTutorial(),
+            this.regraAtual.getExplicacaoExtraTutorial()
+        );
 
+        // 2. Acopla o funcionamento do Slider de volume
+        const sliderVolume = document.getElementById('slider-volume') as HTMLInputElement;
+        if (sliderVolume) {
+            this.renderizador.atualizarVolumeGlobal(parseFloat(sliderVolume.value));
+            sliderVolume.oninput = (e: Event) => {
+                const alvo = e.target as HTMLInputElement;
+                this.renderizador.atualizarVolumeGlobal(parseFloat(alvo.value));
+            };
+        }
+
+        // 3. Vincula o clique do botão de reiniciar localizado abaixo do tabuleiro
+        const btnReiniciar = document.getElementById('btn-reiniciar');
+        if (btnReiniciar) {
+            btnReiniciar.onclick = () => {
+                this.iniciarNovoJogo(this.configAtual, this.regraAtual);
+            };
+        }
+
+        // 4. Mecanismo de Abrir e Fechar da Sidebar Esquerda
+        const sidebar = document.getElementById('sidebar-config');
+        const btnAbrir = document.getElementById('btn-sidebar');
+        const btnFechar = document.getElementById('btn-sidebar-fechar');
+
+        if (sidebar && btnAbrir && btnFechar) {
+            btnAbrir.onclick = () => {
+                sidebar.classList.add('ativa');
+            };
+            btnFechar.onclick = () => {
+                sidebar.classList.remove('ativa');
+            };
+        }
+
+        this.renderizador.reproduzirSomInicio();
         this.notificarStatusTurnoAtual();
         this.renderizarNovamente();
     }
@@ -114,20 +151,16 @@ export class GerenciadorJogo {
         return validos;
     }
 
-    private ejecutarTurnoIA(): void {} // Preservado para evitar referências cruzadas em chamadas herdadas
-
     private executarTurnoJogador(origem: ICoordenada, destino: ICoordenada): void {
         const casasModificadas = this.regraAtual.executarMovimento(origem, destino, this.tabuleiro);
         
-        this.renderizador.atualizarCasasEspecificas(
-            casasModificadas, 
+        this.renderizador.renderizarTabuleiroCompleto(
             this.tabuleiro, 
             (c: ICoordenada) => this.tratarCliqueCasa(c),
             (orig: ICoordenada, dest: ICoordenada) => this.processarMovimentoDireto(orig, dest)
         );
         
         this.renderizador.reproduzirSomMovimento();
-        
         this.limparSelecao();
         this.lancesRestantes--;
 
@@ -145,14 +178,12 @@ export class GerenciadorJogo {
         const movimentoIA = this.regraAtual.calcularTurnoIA(this.tabuleiro);
 
         if (movimentoIA) {
-            const casasModificadas = this.regraAtual.executarMovimento(movimentoIA.origem, movimentoIA.destino, this.tabuleiro);
-            this.renderizador.atualizarCasasEspecificas(
-                casasModificadas, 
+            this.regraAtual.executarMovimento(movimentoIA.origem, movimentoIA.destino, this.tabuleiro);
+            this.renderizador.renderizarTabuleiroCompleto(
                 this.tabuleiro, 
                 (c: ICoordenada) => this.tratarCliqueCasa(c),
                 (orig: ICoordenada, dest: ICoordenada) => this.processarMovimentoDireto(orig, dest)
             );
-            
             this.renderizador.reproduzirSomMovimento();
         }
 
@@ -181,11 +212,11 @@ export class GerenciadorJogo {
         this.jogoFinalizado = true;
         
         if (vencedor === 'JOGADOR') {
-            this.atualizarInterfaceStatus("🏆 VITÓRIA! Você encurralou o Ogro!", "text-success");
+            this.atualizarInterfaceStatus("🏆 VITÓRIA! " + motivo, "text-success");
             this.renderizador.renderizarTabuleiroFimDeJogo(this.tabuleiro, 'VITORIA', (c) => this.tratarCliqueCasa(c));
             this.renderizador.reproduzirSomVitoria();
         } else if (vencedor === 'IA') {
-            this.atualizarInterfaceStatus("❌ DERROTA! O Ogro venceu.", "text-danger");
+            this.atualizarInterfaceStatus("❌ DERROTA! " + motivo, "text-danger");
             this.renderizador.renderizarTabuleiroFimDeJogo(this.tabuleiro, 'DERROTA', (c) => this.tratarCliqueCasa(c));
             this.renderizador.reproduzirSomDerrota();
         } else {
@@ -211,11 +242,10 @@ export class GerenciadorJogo {
         const elemento = document.getElementById("status-turno");
         if (elemento) {
             elemento.className = `fs-5 fw-bold text-center ${classeTexto}`;
-            
             if (!this.jogoFinalizado) {
                 elemento.innerText = `${mensagem} (${this.lancesRestantes} lances restantes)`;
             } else {
-                elemento.innerText = mensagem || mensagem;
+                elemento.innerText = mensagem;
             }
         }
     }

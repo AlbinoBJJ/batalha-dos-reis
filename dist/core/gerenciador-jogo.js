@@ -13,7 +13,7 @@ export class GerenciadorJogo {
         this.configAtual = config;
         this.regraAtual = regras;
         this.tabuleiro = new Tabuleiro(config.linhas, config.colunas);
-        this.tablero = this.tabuleiro; // Sincroniza a propriedade interna herdada se houver
+        this.tablero = this.tabuleiro;
         this.renderizador.configurarEstiloTabuleiro(config.linhas, config.colunas, config.temaClasseCSS);
         this.regraAtual.inicializarCenario(this.tabuleiro);
         this.coordenadaSelecionada = null;
@@ -21,7 +21,36 @@ export class GerenciadorJogo {
         this.turnoAtual = 'JOGADOR';
         this.jogoFinalizado = false;
         this.lancesRestantes = 15;
-        // GATILHO: Dispara o grito do ogro no início da partida!
+        // 1. Alimenta os textos dinâmicos e títulos na nova interface
+        this.renderizador.atualizarTextosInterface(config.nome, this.regraAtual.getObjetivoTutorial(), this.regraAtual.getExplicacaoExtraTutorial());
+        // 2. Acopla o funcionamento do Slider de volume
+        const sliderVolume = document.getElementById('slider-volume');
+        if (sliderVolume) {
+            this.renderizador.atualizarVolumeGlobal(parseFloat(sliderVolume.value));
+            sliderVolume.oninput = (e) => {
+                const alvo = e.target;
+                this.renderizador.atualizarVolumeGlobal(parseFloat(alvo.value));
+            };
+        }
+        // 3. Vincula o clique do botão de reiniciar localizado abaixo do tabuleiro
+        const btnReiniciar = document.getElementById('btn-reiniciar');
+        if (btnReiniciar) {
+            btnReiniciar.onclick = () => {
+                this.iniciarNovoJogo(this.configAtual, this.regraAtual);
+            };
+        }
+        // 4. Mecanismo de Abrir e Fechar da Sidebar Esquerda
+        const sidebar = document.getElementById('sidebar-config');
+        const btnAbrir = document.getElementById('btn-sidebar');
+        const btnFechar = document.getElementById('btn-sidebar-fechar');
+        if (sidebar && btnAbrir && btnFechar) {
+            btnAbrir.onclick = () => {
+                sidebar.classList.add('ativa');
+            };
+            btnFechar.onclick = () => {
+                sidebar.classList.remove('ativa');
+            };
+        }
         this.renderizador.reproduzirSomInicio();
         this.notificarStatusTurnoAtual();
         this.renderizarNovamente();
@@ -93,10 +122,9 @@ export class GerenciadorJogo {
         }
         return validos;
     }
-    ejecutarTurnoIA() { } // Preservado para evitar referências cruzadas em chamadas herdadas
     executarTurnoJogador(origem, destino) {
         const casasModificadas = this.regraAtual.executarMovimento(origem, destino, this.tabuleiro);
-        this.renderizador.atualizarCasasEspecificas(casasModificadas, this.tabuleiro, (c) => this.tratarCliqueCasa(c), (orig, dest) => this.processarMovimentoDireto(orig, dest));
+        this.renderizador.renderizarTabuleiroCompleto(this.tabuleiro, (c) => this.tratarCliqueCasa(c), (orig, dest) => this.processarMovimentoDireto(orig, dest));
         this.renderizador.reproduzirSomMovimento();
         this.limparSelecao();
         this.lancesRestantes--;
@@ -111,8 +139,8 @@ export class GerenciadorJogo {
             return;
         const movimentoIA = this.regraAtual.calcularTurnoIA(this.tabuleiro);
         if (movimentoIA) {
-            const casasModificadas = this.regraAtual.executarMovimento(movimentoIA.origem, movimentoIA.destino, this.tabuleiro);
-            this.renderizador.atualizarCasasEspecificas(casasModificadas, this.tabuleiro, (c) => this.tratarCliqueCasa(c), (orig, dest) => this.processarMovimentoDireto(orig, dest));
+            this.regraAtual.executarMovimento(movimentoIA.origem, movimentoIA.destino, this.tabuleiro);
+            this.renderizador.renderizarTabuleiroCompleto(this.tabuleiro, (c) => this.tratarCliqueCasa(c), (orig, dest) => this.processarMovimentoDireto(orig, dest));
             this.renderizador.reproduzirSomMovimento();
         }
         if (this.verificarFimDePartida())
@@ -135,12 +163,12 @@ export class GerenciadorJogo {
     declararFimDoJogo(vencedor, motivo = "") {
         this.jogoFinalizado = true;
         if (vencedor === 'JOGADOR') {
-            this.atualizarInterfaceStatus("🏆 VITÓRIA! Você encurralou o Ogro!", "text-success");
+            this.atualizarInterfaceStatus("🏆 VITÓRIA! " + motivo, "text-success");
             this.renderizador.renderizarTabuleiroFimDeJogo(this.tabuleiro, 'VITORIA', (c) => this.tratarCliqueCasa(c));
             this.renderizador.reproduzirSomVitoria();
         }
         else if (vencedor === 'IA') {
-            this.atualizarInterfaceStatus("❌ DERROTA! O Ogro venceu.", "text-danger");
+            this.atualizarInterfaceStatus("❌ DERROTA! " + motivo, "text-danger");
             this.renderizador.renderizarTabuleiroFimDeJogo(this.tabuleiro, 'DERROTA', (c) => this.tratarCliqueCasa(c));
             this.renderizador.reproduzirSomDerrota();
         }
@@ -169,7 +197,7 @@ export class GerenciadorJogo {
                 elemento.innerText = `${mensagem} (${this.lancesRestantes} lances restantes)`;
             }
             else {
-                elemento.innerText = mensagem || mensagem;
+                elemento.innerText = mensagem;
             }
         }
     }

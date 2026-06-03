@@ -5,7 +5,6 @@ export class Renderizador {
             throw new Error(`Erro Crítico: Container com ID "${containerId}" não foi encontrado no HTML.`);
         }
         this.container = elemento;
-        // Inicialização dos buffers de áudio nativos
         this.somMovimento = new Audio('assets/sounds/move.mp3');
         this.somInicio = new Audio('assets/sounds/ogro-grito.mp3');
         this.somDerrota = new Audio('assets/sounds/risada.mp3');
@@ -35,21 +34,12 @@ export class Renderizador {
             wrapper.className = `p-3 rounded shadow ${temaClasseCSS}`;
         }
     }
-    /**
-     * Renderiza o tabuleiro no estado padrão (gameplay activa).
-     */
     renderizarTabuleiroCompleto(tabuleiro, onCasaClique, onMoverPeca) {
         this.renderizarComEstadoVisual(tabuleiro, 'NORMAL', onCasaClique, onMoverPeca);
     }
-    /**
-     * Renderiza o tabuleiro aplicando as artes específicas de fim de jogo (Vitória ou Derrota do Jogador).
-     */
     renderizarTabuleiroFimDeJogo(tabuleiro, estadoFinal, onCasaClique) {
         this.renderizarComEstadoVisual(tabuleiro, estadoFinal, onCasaClique);
     }
-    /**
-     * Motor interno de renderização matricial com suporte a troca dinâmica de caminhos de imagem.
-     */
     renderizarComEstadoVisual(tabuleiro, estadoVisual, onCasaClique, onMoverPeca) {
         this.container.innerHTML = '';
         const grade = tabuleiro.getGrade();
@@ -66,7 +56,6 @@ export class Renderizador {
         casaDiv.classList.add('casa');
         casaDiv.dataset.linha = dadosCasa.coordenada.linha.toString();
         casaDiv.dataset.coluna = dadosCasa.coordenada.coluna.toString();
-        // Passamos as coordenadas para que o renderizador aplique o xadrez por baixo de qualquer terreno
         this.aplicarEstiloTerreno(casaDiv, dadosCasa.terreno, dadosCasa.coordenada.linha, dadosCasa.coordenada.coluna);
         if (dadosCasa.peca) {
             const pecaDiv = document.createElement('div');
@@ -191,19 +180,6 @@ export class Renderizador {
         });
         return casaDiv;
     }
-    atualizarCasasEspecificas(coordenadas, tabuleiro, onCasaClique, onMoverPeca) {
-        coordenadas.forEach(coord => {
-            const seletor = `.casa[data-linha="${coord.linha}"][data-coluna="${coord.coluna}"]`;
-            const casaAntiga = this.container.querySelector(seletor);
-            if (casaAntiga) {
-                const dadosCasaNova = tabuleiro.getCasa(coord.linha, coord.coluna);
-                if (dadosCasaNova) {
-                    const casaNova = this.criarElementoCasa(dadosCasaNova, 'NORMAL', onCasaClique, onMoverPeca);
-                    casaAntiga.replaceWith(casaNova);
-                }
-            }
-        });
-    }
     destacarMovimentosValidos(origem, caminhosValidos) {
         this.container.querySelectorAll('.casa').forEach(casa => {
             casa.classList.remove('selecionada', 'movimento-valido');
@@ -219,14 +195,12 @@ export class Renderizador {
         });
     }
     aplicarEstiloTerreno(elemento, terreno, linha, coluna) {
-        // 1. Aplica o padrão xadrez base (Grama clara ou escura) em todas as casas sem exceção
         if ((linha + coluna) % 2 === 0) {
             elemento.classList.add('casa-clara');
         }
         else {
             elemento.classList.add('casa-escura');
         }
-        // 2. Adiciona as classes especiais por cima da grama mapeada
         switch (terreno) {
             case 'FLORESTA':
                 elemento.classList.add('casa-floresta');
@@ -235,5 +209,27 @@ export class Renderizador {
                 elemento.classList.add('casa-obstaculo');
                 break;
         }
+    }
+    atualizarVolumeGlobal(volume) {
+        this.somMovimento.volume = volume;
+        this.somInicio.volume = volume;
+        this.somDerrota.volume = volume;
+        this.somVitoria.volume = volume;
+    }
+    atualizarTextosInterface(nomeJogo, objetivo, extra) {
+        const txtTitulo = document.getElementById('titulo-jogo-ativo');
+        const txtObjetivo = document.getElementById('tutorial-texto-objetivo');
+        const txtExtra = document.getElementById('tutorial-texto-extra');
+        if (txtTitulo) {
+            console.log("Elemento encontrado, alterando de:", txtTitulo.innerText, "para:", nomeJogo);
+            txtTitulo.innerText = nomeJogo;
+        }
+        else {
+            console.error("ERRO: Elemento 'titulo-jogo-ativo' não encontrado no DOM!");
+        }
+        if (txtObjetivo)
+            txtObjetivo.innerText = objetivo;
+        if (txtExtra)
+            txtExtra.innerText = extra;
     }
 }

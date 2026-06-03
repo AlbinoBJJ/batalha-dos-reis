@@ -4,7 +4,6 @@ import { ICoordenada, ICasa } from '../contratos/itabuleiro.js';
 export class Renderizador {
     private container: HTMLElement;
     
-    // Catálogo de Efeitos Sonoros
     private somMovimento: HTMLAudioElement;
     private somInicio: HTMLAudioElement;
     private somDerrota: HTMLAudioElement;
@@ -17,7 +16,6 @@ export class Renderizador {
         }
         this.container = elemento;
         
-        // Inicialização dos buffers de áudio nativos
         this.somMovimento = new Audio('assets/sounds/move.mp3');
         this.somInicio = new Audio('assets/sounds/ogro-grito.mp3');
         this.somDerrota = new Audio('assets/sounds/risada.mp3');
@@ -54,9 +52,6 @@ export class Renderizador {
         }
     }
 
-    /**
-     * Renderiza o tabuleiro no estado padrão (gameplay activa).
-     */
     public renderizarTabuleiroCompleto(
         tabuleiro: Tabuleiro, 
         onCasaClique: (coord: ICoordenada) => void,
@@ -65,9 +60,6 @@ export class Renderizador {
         this.renderizarComEstadoVisual(tabuleiro, 'NORMAL', onCasaClique, onMoverPeca);
     }
 
-    /**
-     * Renderiza o tabuleiro aplicando as artes específicas de fim de jogo (Vitória ou Derrota do Jogador).
-     */
     public renderizarTabuleiroFimDeJogo(
         tabuleiro: Tabuleiro,
         estadoFinal: 'VITORIA' | 'DERROTA',
@@ -76,9 +68,6 @@ export class Renderizador {
         this.renderizarComEstadoVisual(tabuleiro, estadoFinal, onCasaClique);
     }
 
-    /**
-     * Motor interno de renderização matricial com suporte a troca dinâmica de caminhos de imagem.
-     */
     private renderizarComEstadoVisual(
         tabuleiro: Tabuleiro,
         estadoVisual: 'NORMAL' | 'VITORIA' | 'DERROTA',
@@ -109,7 +98,6 @@ export class Renderizador {
         casaDiv.dataset.linha = dadosCasa.coordenada.linha.toString();
         casaDiv.dataset.coluna = dadosCasa.coordenada.coluna.toString();
 
-        // Passamos as coordenadas para que o renderizador aplique o xadrez por baixo de qualquer terreno
         this.aplicarEstiloTerreno(casaDiv, dadosCasa.terreno, dadosCasa.coordenada.linha, dadosCasa.coordenada.coluna);
 
         if (dadosCasa.peca) {
@@ -118,8 +106,8 @@ export class Renderizador {
             pecaDiv.classList.add(`peca-${dadosCasa.peca.tipo.toLowerCase()}`);
             
             let caractereFonte = dadosCasa.peca.tipo === 'REI_BRANCO' ? 'k' : 'l';
-
             let urlImagem = '';
+
             if (dadosCasa.peca.tipo === 'REI_BRANCO') {
                 if (estadoVisual === 'VITORIA') {
                     urlImagem = 'assets/images/rei-branco-vitoria.png';
@@ -247,26 +235,6 @@ export class Renderizador {
         return casaDiv;
     }
 
-    public atualizarCasasEspecificas(
-        coordenadas: ICoordenada[], 
-        tabuleiro: Tabuleiro, 
-        onCasaClique: (coord: ICoordenada) => void,
-        onMoverPeca?: (origem: ICoordenada, destino: ICoordenada) => void
-    ): void {
-        coordenadas.forEach(coord => {
-            const seletor = `.casa[data-linha="${coord.linha}"][data-coluna="${coord.coluna}"]`;
-            const casaAntiga = this.container.querySelector(seletor) as HTMLElement;
-            
-            if (casaAntiga) {
-                const dadosCasaNova = tabuleiro.getCasa(coord.linha, coord.coluna);
-                if (dadosCasaNova) {
-                    const casaNova = this.criarElementoCasa(dadosCasaNova, 'NORMAL', onCasaClique, onMoverPeca);
-                    casaAntiga.replaceWith(casaNova);
-                }
-            }
-        });
-    }
-
     public destacarMovimentosValidos(origem: ICoordenada | null, caminhosValidos: ICoordenada[]): void {
         this.container.querySelectorAll('.casa').forEach(casa => {
             casa.classList.remove('selecionada', 'movimento-valido');
@@ -285,14 +253,12 @@ export class Renderizador {
     }
 
     private aplicarEstiloTerreno(elemento: HTMLElement, terreno: string, linha: number, coluna: number): void {
-        // 1. Aplica o padrão xadrez base (Grama clara ou escura) em todas as casas sem exceção
         if ((linha + coluna) % 2 === 0) {
             elemento.classList.add('casa-clara');
         } else {
             elemento.classList.add('casa-escura');
         }
 
-        // 2. Adiciona as classes especiais por cima da grama mapeada
         switch (terreno) {
             case 'FLORESTA': 
                 elemento.classList.add('casa-floresta'); 
@@ -301,5 +267,27 @@ export class Renderizador {
                 elemento.classList.add('casa-obstaculo'); 
                 break;
         }
+    }
+
+    public atualizarVolumeGlobal(volume: number): void {
+        this.somMovimento.volume = volume;
+        this.somInicio.volume = volume;
+        this.somDerrota.volume = volume;
+        this.somVitoria.volume = volume;
+    }
+
+    public atualizarTextosInterface(nomeJogo: string, objetivo: string, extra: string): void {
+        const txtTitulo = document.getElementById('titulo-jogo-ativo');
+        const txtObjetivo = document.getElementById('tutorial-texto-objetivo');
+        const txtExtra = document.getElementById('tutorial-texto-extra');
+
+        if (txtTitulo) {
+            console.log("Elemento encontrado, alterando de:", txtTitulo.innerText, "para:", nomeJogo);
+            txtTitulo.innerText = nomeJogo;
+        } else {
+            console.error("ERRO: Elemento 'titulo-jogo-ativo' não encontrado no DOM!");
+        }
+        if (txtObjetivo) txtObjetivo.innerText = objetivo;
+        if (txtExtra) txtExtra.innerText = extra;
     }
 }

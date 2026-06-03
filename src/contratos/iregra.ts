@@ -13,7 +13,9 @@ export interface IRegra {
     executarMovimento(origem: ICoordenada, destino: ICoordenada, tabuleiro: Tabuleiro): ICoordenada[];
     verificarFimDeJogo(tabuleiro: Tabuleiro): IResultadoJogo;
     calcularTurnoIA(tabuleiro: Tabuleiro): { origem: ICoordenada; destino: ICoordenada } | null;
-    
-    // NOVO: Permite ao gerenciador ler o status do combo atual do jogo
     getMensagemStatusCustomizada(): string;
+    
+    // Contratos obrigatórios das strings do Tutorial
+    getObjetivoTutorial(): string;
+    getExplicacaoExtraTutorial(): string;
 }

@@ -15,10 +15,8 @@ export class SumoRegras implements IRegra {
         for (let l = 0; l < tabuleiro.linhas; l++) {
             for (let c = 0; c < tabuleiro.colunas; c++) {
                 if (l === 0) {
-                    // Apenas a fileira do topo vira o terreno especial do gol
                     tabuleiro.definirTerreno(l, c, 'FLORESTA');
                 } else {
-                    // O resto do tabuleiro INTEIRO segue o padrão matemático
                     if ((l + c) % 2 === 0) {
                         tabuleiro.definirTerreno(l, c, 'NORMAL_CLARA');
                     } else {
@@ -78,9 +76,7 @@ export class SumoRegras implements IRegra {
     }
 
     public executarMovimento(origem: ICoordenada, destino: ICoordenada, tabuleiro: Tabuleiro): ICoordenada[] {
-        // CORRIGIDO: Removido o bug do 'origin' digitado incorretamente
         const peca = tabuleiro.getCasa(origem.linha, origem.coluna)?.peca;
-        
         tabuleiro.moverPecaEmMemoria(origem, destino);
 
         if (peca && peca.cor === 'BRANCO') {
@@ -104,12 +100,10 @@ export class SumoRegras implements IRegra {
         const coordBranco = this.encontrarPecaPorTipo(tabuleiro, 'REI_BRANCO');
         const coordPreto = this.encontrarPecaPorTipo(tabuleiro, 'REI_PRETO');
 
-        // O Rei Branco perde se tocar nas bordas limites do quintal
         if (coordBranco && this.ehBordaFisica(coordBranco, tabuleiro)) {
             return { terminou: true, vencedor: 'IA', motivo: 'Você recuou demais e saiu do quintal!' };
         }
         
-        // VITÓRIA DO JOGADOR: O Ogro só perde se entrar especificamente na linha da Floresta (linha 0)
         if (coordPreto && coordPreto.linha === 0) {
             return { terminou: true, vencedor: 'JOGADOR', motivo: 'Sensacional! O Ogro foi expulso para a floresta!' };
         }
@@ -151,7 +145,6 @@ export class SumoRegras implements IRegra {
         let destinoFinal = oOrigem;
 
         if (!guardaQuebrada) {
-            // O Ogro foca matematicamente no centro para proteger o ouro
             movimentosPossiveis.sort((a, b) => {
                 const distA = Math.pow(a.linha - 3.5, 2) + Math.pow(a.coluna - 3.5, 2);
                 const distB = Math.pow(b.linha - 3.5, 2) + Math.pow(b.coluna - 3.5, 2);
@@ -194,5 +187,13 @@ export class SumoRegras implements IRegra {
             }
         }
         return null;
+    }
+
+    public getObjetivoTutorial(): string {
+        return "O objetivo do Rei Branco é expulsar o Rei Ogro para a floresta, ou seja, a última fileira do tabuleiro. Mas cuidado: os Reis nunca podem ir para uma casa que pode ser atacada! É como se possuíssem um campo de força invisível e nunca podem se encostar, pois se caso isso acontecer, o Rei que se aproximou se colocaria em posição de perigo, sofrendo um ataque! NUNCA, JAMAIS, coloque seu Rei sob perigo! Para ganhar o jogo, você precisa manter a oposição!";
+    }
+
+    public getExplicacaoExtraTutorial(): string {
+        return "A Oposição acontece quando os dois Reis ficam frente a frente, separados por apenas uma casa. Quem joga nessa situação força o outro Rei a recuar, ganhando espaço! Aquele que joga o Rei ficando frente a frente do outro, dizemos que ele ganhou a oposição! Tente GANHAR a oposição sempre!";
     }
 }
